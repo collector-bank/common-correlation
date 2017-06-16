@@ -15,27 +15,42 @@ namespace Collector.Common.Correlation
     public static class CorrelationState
     {
         private static readonly IList<Action<Guid>> InitializeCorrelation_ = new List<Action<Guid>>
-                                                                    {
-                                                                        ThreadStaticCorrelationState.InitializeCorrelation
-                                                                    };
+                                                                             {
+#if NET45
+                                                                                 CallerContextCorrelationState.InitializeCorrelation,
+#endif
+                                                                                 ThreadStaticCorrelationState.InitializeCorrelation,
+                                                                             };
 
         private static readonly IList<Action> ClearCorrelation_ = new List<Action>
                                                                   {
-                                                                      ThreadStaticCorrelationState.ClearCorrelation
+#if NET45
+                                                                      CallerContextCorrelationState.ClearCorrelation,
+#endif
+                                                                      ThreadStaticCorrelationState.ClearCorrelation,
                                                                   };
 
         private static readonly IList<Func<Guid?>> GetCurrentCorrelationId_ = new List<Func<Guid?>>
-                                                                  {
-                                                                      ThreadStaticCorrelationState.GetCurrentCorrelationId
-                                                                  };
+                                                                              {
+#if NET45
+                                                                                  CallerContextCorrelationState.GetCurrentCorrelationId,
+#endif
+                                                                                  ThreadStaticCorrelationState.GetCurrentCorrelationId,
+                                                                              };
 
         private static readonly IList<Func<string, object, bool>> TryAddOrUpdateCorrelationValue_ = new List<Func<string, object, bool>>
-                                                                  {
-                                                                      ThreadStaticCorrelationState.TryAddOrUpdateCorrelationValue
-                                                                  };
+                                                                                                    {
+#if NET45
+                                                                                                        CallerContextCorrelationState.TryAddOrUpdateCorrelationValue,
+#endif
+                                                                                                        ThreadStaticCorrelationState.TryAddOrUpdateCorrelationValue,
+                                                                                                    };
 
         private static readonly IList<Func<IEnumerable<KeyValuePair<string, object>>>> GetCorrelationValues_ = new List<Func<IEnumerable<KeyValuePair<string, object>>>>
                                                                                                                {
+#if NET45
+                                                                                                                   CallerContextCorrelationState.GetCorrelationValues,
+#endif
                                                                                                                    ThreadStaticCorrelationState.GetCorrelationValues
                                                                                                                };
 
