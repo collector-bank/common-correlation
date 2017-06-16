@@ -4,7 +4,6 @@ namespace Collector.Common.Correlation
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     
     internal static class ThreadStaticCorrelationState
