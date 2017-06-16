@@ -58,13 +58,16 @@ namespace Collector.Common.Correlation
         /// Initialize a new correlation state. This is tracked by thread id.
         /// </summary>
         /// <param name="existingCorrelationId">Use this parameter to set the correlation id</param>
-        /// <returns>The current correlation id</returns>
-        public static Guid InitializeCorrelation(Guid? existingCorrelationId = null)
+        /// <returns>
+        /// The current correlation id, wraped in a disposable class. 
+        /// To clear the correlation, either dipose this object or call the CorrelationState.ClearCorrelation() method.
+        /// </returns>
+        public static DisposableCorrelationState InitializeCorrelation(Guid? existingCorrelationId = null)
         {
             var correlationId = existingCorrelationId ?? Guid.NewGuid();
             InitializeCorrelation_.ForEach(a => a(correlationId));
 
-            return correlationId;
+            return new DisposableCorrelationState(correlationId);
         }
 
         /// <summary>
