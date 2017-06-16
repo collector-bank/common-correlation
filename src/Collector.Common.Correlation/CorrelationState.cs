@@ -6,24 +6,38 @@
 namespace Collector.Common.Correlation
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
 
     /// <summary>
     /// Tracks and keeps the current correlation state
     /// </summary>
     public static class CorrelationState
     {
-        [ThreadStatic]
-        private static Guid? correlationId;
+        private static readonly IList<Action<Guid>> InitializeCorrelation_ = new List<Action<Guid>>
+                                                                    {
+                                                                        ThreadStaticCorrelationState.InitializeCorrelation
+                                                                    };
 
-        [ThreadStatic]
-        private static int? threadId;
+        private static readonly IList<Action> ClearCorrelation_ = new List<Action>
+                                                                  {
+                                                                      ThreadStaticCorrelationState.ClearCorrelation
+                                                                  };
 
-        [ThreadStatic]
-        private static ConcurrentDictionary<string, object> correlationDictionary;
+        private static readonly IList<Func<Guid?>> GetCurrentCorrelationId_ = new List<Func<Guid?>>
+                                                                  {
+                                                                      ThreadStaticCorrelationState.GetCurrentCorrelationId
+                                                                  };
+
+        private static readonly IList<Func<string, object, bool>> TryAddOrUpdateCorrelationValue_ = new List<Func<string, object, bool>>
+                                                                  {
+                                                                      ThreadStaticCorrelationState.TryAddOrUpdateCorrelationValue
+                                                                  };
+
+        private static readonly IList<Func<IEnumerable<KeyValuePair<string, object>>>> GetCorrelationValues_ = new List<Func<IEnumerable<KeyValuePair<string, object>>>>
+                                                                                                               {
+                                                                                                                   ThreadStaticCorrelationState.GetCorrelationValues
+                                                                                                               };
 
         /// <summary>
         /// Initialize a new correlation state. This is tracked by thread id.
@@ -32,11 +46,10 @@ namespace Collector.Common.Correlation
         /// <returns>The current correlation id</returns>
         public static Guid InitializeCorrelation(Guid? existingCorrelationId = null)
         {
-            threadId = Thread.CurrentThread.ManagedThreadId;
-            correlationId = existingCorrelationId ?? Guid.NewGuid();
-            correlationDictionary = new ConcurrentDictionary<string, object>();
+            var correlationId = existingCorrelationId ?? Guid.NewGuid();
+            InitializeCorrelation_.ForEach(a => a(correlationId));
 
-            return correlationId.Value;
+            return correlationId;
         }
 
         /// <summary>
@@ -44,10 +57,7 @@ namespace Collector.Common.Correlation
         /// </summary>
         public static void ClearCorrelation()
         {
-            threadId = null;
-            correlationId = null;
-            correlationDictionary?.Clear();
-            correlationDictionary = null;
+            ClearCorrelation_.ForEach(a => a());
         }
 
         /// <summary>
@@ -56,8 +66,12 @@ namespace Collector.Common.Correlation
         /// <returns>The current correlation id, otherwise null</returns>
         public static Guid? GetCurrentCorrelationId()
         {
-            if (HasActiveCorrelationSession())
-                return correlationId;
+            foreach (var func in GetCurrentCorrelationId_)
+            {
+                var correlationId = func();
+                if (correlationId.HasValue)
+                    return correlationId;
+            }
 
             return null;
         }
@@ -70,15 +84,9 @@ namespace Collector.Common.Correlation
         /// <returns>True value was added to the correlation session.</returns>
         public static bool TryAddOrUpdateCorrelationValue(string name, object value)
         {
-            if (!HasActiveCorrelationSession())
-                return false;
-
-            if (correlationDictionary == null)
-                correlationDictionary = new ConcurrentDictionary<string, object>();
-
-            correlationDictionary.AddOrUpdate(name, value, (s, o) => value);
-
-            return true;
+            return TryAddOrUpdateCorrelationValue_.Select(a => a(name, value))
+                                                  .ToArray()
+                                                  .Any(b => b);
         }
 
         /// <summary>
@@ -86,16 +94,14 @@ namespace Collector.Common.Correlation
         /// </summary>
         public static IEnumerable<KeyValuePair<string, object>> GetCorrelationValues()
         {
-            return correlationDictionary ?? Enumerable.Empty<KeyValuePair<string, object>>();
-        }
+            foreach (var func in GetCorrelationValues_)
+            {
+                var correlationId = func();
+                if (correlationId != null)
+                    return correlationId;
+            }
 
-        private static bool HasActiveCorrelationSession()
-        {
-            if (threadId == null)
-                return false;
-            if (correlationId == null)
-                return false;
-            return threadId.Value == Thread.CurrentThread.ManagedThreadId;
+            return Enumerable.Empty<KeyValuePair<string, object>>();
         }
     }
 }
