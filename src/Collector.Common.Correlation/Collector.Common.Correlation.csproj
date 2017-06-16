@@ -4,15 +4,19 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
     <DebugType>portable</DebugType>
-    <AssemblyName>Serilog.Enrichers.Assembly</AssemblyName>
-    <PackageId>Serilog.Enrichers.Assembly</PackageId>
+    <AssemblyName>Collector.Common.Correlation</AssemblyName>
+    <PackageId>Collector.Common.Correlation</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <Version>1.0.0</Version>
     <Copyright>Copyright © 2017</Copyright>
-    <Description />
+    <Description>Package for managing correlation ids and correlation states.</Description>
     <Authors />
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/collector-bank/common-correlation</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/collector-bank/common-correlation</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
