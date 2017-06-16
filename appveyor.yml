@@ -12,9 +12,3 @@ test:
 artifacts:
 - path: '**\*.nupkg'
   name: NuGet-Package
-deploy:
-- provider: NuGet
-  api_key:
-  artifact: NuGet-Package
-  on:
-    branch: master
