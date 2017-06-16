@@ -18,6 +18,8 @@ namespace Collector.Common.Correlation
                                                                              {
 #if NET45
                                                                                  CallerContextCorrelationState.InitializeCorrelation,
+#else
+                                                                                 AsyncLocalCorrelationState.InitializeCorrelation,
 #endif
                                                                                  ThreadStaticCorrelationState.InitializeCorrelation,
                                                                              };
@@ -26,6 +28,8 @@ namespace Collector.Common.Correlation
                                                                   {
 #if NET45
                                                                       CallerContextCorrelationState.ClearCorrelation,
+#else
+                                                                      AsyncLocalCorrelationState.ClearCorrelation,
 #endif
                                                                       ThreadStaticCorrelationState.ClearCorrelation,
                                                                   };
@@ -34,6 +38,8 @@ namespace Collector.Common.Correlation
                                                                               {
 #if NET45
                                                                                   CallerContextCorrelationState.GetCurrentCorrelationId,
+#else
+                                                                                  AsyncLocalCorrelationState.GetCurrentCorrelationId,
 #endif
                                                                                   ThreadStaticCorrelationState.GetCurrentCorrelationId,
                                                                               };
@@ -42,6 +48,8 @@ namespace Collector.Common.Correlation
                                                                                                     {
 #if NET45
                                                                                                         CallerContextCorrelationState.TryAddOrUpdateCorrelationValue,
+#else
+                                                                                                        AsyncLocalCorrelationState.TryAddOrUpdateCorrelationValue,
 #endif
                                                                                                         ThreadStaticCorrelationState.TryAddOrUpdateCorrelationValue,
                                                                                                     };
@@ -50,6 +58,8 @@ namespace Collector.Common.Correlation
                                                                                                                {
 #if NET45
                                                                                                                    CallerContextCorrelationState.GetCorrelationValues,
+#else
+                                                                                                                   AsyncLocalCorrelationState.GetCorrelationValues,
 #endif
                                                                                                                    ThreadStaticCorrelationState.GetCorrelationValues
                                                                                                                };
