@@ -5,18 +5,11 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    using NUnit.Framework;
+    using Xunit;
 
-    [TestFixture]
-    public class CorrelationState_Test
+    public class CorrelationState_Test : IDisposable
     {
-        [TearDown]
-        public void TearDown()
-        {
-            CorrelationState.ClearCorrelation();    
-        }
-
-        [Test]
+        [Fact]
         public void When_correlation_is_access_different_threads_It_returns_different_ids()
         {
             var thread1 = Task<Guid?>.Factory.StartNew(() =>
@@ -42,10 +35,10 @@
                                                        });
             Task.WaitAll(thread1, thread2);
 
-            Assert.AreNotSame(thread1.Result, thread2.Result);
+            Assert.NotEqual(thread1.Result, thread2.Result);
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_set_with_a_predefined_correlation_id_Then_it_should_always_return_it()
         {
             var correlationId1 = Guid.NewGuid();
@@ -75,11 +68,11 @@
 
             Task.WaitAll(thread1, thread2);
 
-            Assert.AreEqual(correlationId1, thread1.Result);
-            Assert.AreEqual(correlationId2, thread2.Result);
+            Assert.Equal(correlationId1, thread1.Result);
+            Assert.Equal(correlationId2, thread2.Result);
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_uninitialized_Then_it_returns_null_when_asked_for_current_correlation_id()
         {
             var thread = Task<Guid?>.Factory.StartNew(() =>
@@ -90,10 +83,10 @@
 
             Task.WaitAll(thread);
 
-            Assert.IsNull(thread.Result);
+            Assert.Null(thread.Result);
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_initialized_and_cleared_Then_it_returns_null_when_asked_for_current_correlation_id()
         {
             var thread = Task<Guid?>.Factory.StartNew(() =>
@@ -107,10 +100,10 @@
 
             Task.WaitAll(thread);
 
-            Assert.IsNull(thread.Result);
+            Assert.Null(thread.Result);
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_initialized_then_correlation_dictionary_accepts_new_correlation_keyvalues()
         {
             var key = Guid.NewGuid().ToString();
@@ -128,10 +121,10 @@
             Task.WaitAll(thread);
 
             var actualValue = thread.Result.SingleOrDefault(c => c.Key == key);
-            Assert.AreEqual(expectedValue, actualValue.Value);
+            Assert.Equal(expectedValue, actualValue.Value);
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_initialized_and_correlation_value_is_updated_then_the_previous_value_of_the_same_key_is_overwritten()
         {
             var key = Guid.NewGuid().ToString();
@@ -150,10 +143,10 @@
             Task.WaitAll(thread);
 
             var actualValue = thread.Result.SingleOrDefault(c => c.Key == key);
-            Assert.AreEqual(expectedValue, actualValue.Value);
+            Assert.Equal(expectedValue, actualValue.Value);
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_initialized_and_then_cleared_then_it_forgets_the_correlation_keyvalues()
         {
             var thread = Task<IEnumerable<KeyValuePair<string, object>>>.Factory.StartNew(() =>
@@ -169,19 +162,19 @@
 
             Task.WaitAll(thread);
 
-            Assert.IsFalse(thread.Result.Any());
+            Assert.False(thread.Result.Any());
         }
 
-        [Test]
+        [Fact]
         public void When_correlation_is_not_initialized_then_it_forgets_the_correlation_keyvalues()
         {
             CorrelationState.TryAddOrUpdateCorrelationValue(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
             var values = CorrelationState.GetCorrelationValues();
 
-            Assert.IsFalse(values.Any());
+            Assert.False(values.Any());
         }
 
-        [Test]
+        [Fact]
         public async Task When_correlation_id_is_set_outside_an_async_call_then_the_correlation_id_is_available_inside_the_async_call()
         {
             var expectedCorrelationId = Guid.NewGuid();
@@ -190,10 +183,10 @@
 
             var correlationId = await Task.Run(() => CorrelationState.GetCurrentCorrelationId());
 
-            Assert.AreEqual(expectedCorrelationId, correlationId);
+            Assert.Equal(expectedCorrelationId, correlationId);
         }
 
-        [Test]
+        [Fact]
         public async Task When_correlation_values_is_set_outside_an_async_call_then_the_correlation_values_are_available_inside_the_async_call()
         {
             var key = Guid.NewGuid().ToString();
@@ -204,15 +197,15 @@
 
             var correlationValues = (await Task.Run(() => CorrelationState.GetCorrelationValues())).ToList();
 
-            Assert.AreEqual(1, correlationValues.Count);
+            Assert.Equal(1, correlationValues.Count);
 
             var firstCorrelationValue = correlationValues.First();
 
-            Assert.AreEqual(key, firstCorrelationValue.Key);
-            Assert.AreEqual(value, firstCorrelationValue.Value);
+            Assert.Equal(key, firstCorrelationValue.Key);
+            Assert.Equal(value, firstCorrelationValue.Value);
         }
 
-        [Test]
+        [Fact]
         public async Task When_correlation_values_is_set_inside_an_async_call_then_the_correlation_values_are_available_outside_the_async_call()
         {
             var key = Guid.NewGuid().ToString();
@@ -224,12 +217,17 @@
 
             var correlationValues = CorrelationState.GetCorrelationValues().ToList();
 
-            Assert.AreEqual(1, correlationValues.Count);
+            Assert.Equal(1, correlationValues.Count);
 
             var firstCorrelationValue = correlationValues.First();
 
-            Assert.AreEqual(key, firstCorrelationValue.Key);
-            Assert.AreEqual(value, firstCorrelationValue.Value);
+            Assert.Equal(key, firstCorrelationValue.Key);
+            Assert.Equal(value, firstCorrelationValue.Value);
+        }
+
+        public void Dispose()
+        {
+           CorrelationState.ClearCorrelation();
         }
     }
 }
