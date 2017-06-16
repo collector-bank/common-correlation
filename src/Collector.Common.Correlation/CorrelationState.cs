@@ -121,5 +121,23 @@ namespace Collector.Common.Correlation
 
             return Enumerable.Empty<KeyValuePair<string, object>>();
         }
+
+        /// <summary>
+        /// If you jump across several different threads using different threading methods (as in WPF threading and async await nested) then you can manually resyncronize the correlation state.
+        /// </summary>
+        /// <returns>True if the syncronization was successful.</returns>
+        public static bool TryManuallySyncronizeCorrelationState()
+        {
+            var correlationId = GetCurrentCorrelationId();
+
+            if (correlationId.HasValue)
+            {
+                var correlationValues = GetCorrelationValues();
+                InitializeCorrelation(correlationId);
+                correlationValues?.ForEach(kvp => TryAddOrUpdateCorrelationValue(kvp.Key, kvp.Value));
+            }
+
+            return correlationId.HasValue;
+        }
     }
 }
