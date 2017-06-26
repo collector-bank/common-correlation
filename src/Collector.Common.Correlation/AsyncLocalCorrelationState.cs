@@ -7,7 +7,7 @@ namespace Collector.Common.Correlation
     using System.Collections.Generic;
     using System.Threading;
 
-    public static class AsyncLocalCorrelationState
+    internal static class AsyncLocalCorrelationState
     {
         private static readonly AsyncLocal<Guid?> CorrelationId = new AsyncLocal<Guid?>();
         private static readonly AsyncLocal<ConcurrentDictionary<string, object>> CorrelationValues = new AsyncLocal<ConcurrentDictionary<string, object>>();

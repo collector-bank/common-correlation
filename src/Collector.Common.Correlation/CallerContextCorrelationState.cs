@@ -7,7 +7,7 @@ namespace Collector.Common.Correlation
     using System.Collections.Generic;
     using System.Runtime.Remoting.Messaging;
     
-    public static class CallerContextCorrelationState
+    internal static class CallerContextCorrelationState
     {
         private const string CORRELATION_VALUES = "CorrelationValues";
         private const string CORRELATION_ID = "CorrelationId";
