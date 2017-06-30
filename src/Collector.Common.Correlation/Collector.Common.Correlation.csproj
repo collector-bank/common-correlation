@@ -9,15 +9,17 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Copyright>Copyright © 2017</Copyright>
     <Description>Package for managing correlation ids and correlation states.</Description>
-    <Authors>Heimdal, Nohm, Houdini</Authors>
+    <Authors>Team Heimdal, Team Nohm, Team Houdini</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/collector-bank/common-correlation</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/collector-bank/common-correlation</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageIconUrl>https://raw.githubusercontent.com/collector-bank/common-correlation/master/icon.png</PackageIconUrl>
+    <PackageTags>collectorbank collector</PackageTags>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
