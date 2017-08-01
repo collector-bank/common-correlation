@@ -65,7 +65,7 @@ namespace Collector.Common.Correlation
                                                                                                                };
 
         /// <summary>
-        /// Initialize a new correlation state. This is tracked by thread id.
+        /// Initialize a new correlation state.
         /// </summary>
         /// <param name="existingCorrelationId">Use this parameter to set the correlation id</param>
         /// <returns>
@@ -81,7 +81,22 @@ namespace Collector.Common.Correlation
         }
 
         /// <summary>
-        /// Clears the correlation state for this thread
+        /// Ensures that a correlation exists by either giving you the existing correlation, or by creating a new.
+        /// </summary>
+        /// <returns>
+        /// If there already existed a correlation, then the disposable returned will not clear the ongoing correlation.
+        /// </returns>
+        public static DisposableCorrelationState EnsureCorrelation()
+        {
+            var correlationId = GetCurrentCorrelationId();
+            if (correlationId.HasValue)
+                return new DisposableCorrelationState(correlationId.Value, clearOnDispose: false);
+
+            return InitializeCorrelation();
+        }
+
+        /// <summary>
+        /// Clears the current correlation.
         /// </summary>
         public static void ClearCorrelation()
         {

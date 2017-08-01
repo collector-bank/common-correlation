@@ -7,13 +7,16 @@ namespace Collector.Common.Correlation
     /// </summary>
     public class DisposableCorrelationState : IDisposable
     {
+        private readonly bool _clearOnDispose;
+
         /// <summary>
         /// The Correlation id for the current scope.
         /// </summary>
         public Guid CorrelationId { get; }
 
-        internal DisposableCorrelationState(Guid correlationId)
+        internal DisposableCorrelationState(Guid correlationId, bool clearOnDispose = true)
         {
+            _clearOnDispose = clearOnDispose;
             CorrelationId = correlationId;
         }
 
@@ -22,7 +25,8 @@ namespace Collector.Common.Correlation
         /// </summary>
         public void Dispose()
         {
-            CorrelationState.ClearCorrelation();
+            if (_clearOnDispose)
+                CorrelationState.ClearCorrelation();
         }
 
         public static implicit operator Guid(DisposableCorrelationState disposableCorrelationState)
