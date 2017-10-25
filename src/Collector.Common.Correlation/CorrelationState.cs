@@ -6,6 +6,7 @@
 namespace Collector.Common.Correlation
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -14,55 +15,22 @@ namespace Collector.Common.Correlation
     /// </summary>
     public static class CorrelationState
     {
-        private static readonly IList<Action<Guid>> InitializeCorrelation_ = new List<Action<Guid>>
-                                                                             {
-#if NET45
-                                                                                 CallerContextCorrelationState.InitializeCorrelation,
-#else
-                                                                                 AsyncLocalCorrelationState.InitializeCorrelation,
-#endif
-                                                                                 ThreadStaticCorrelationState.InitializeCorrelation,
-                                                                             };
+        private static readonly ConcurrentBag<ICorrelationState> CorrelationStates = new ConcurrentBag<ICorrelationState>();
 
-        private static readonly IList<Action> ClearCorrelation_ = new List<Action>
-                                                                  {
+        static CorrelationState()
+        {
+            Use(new ThreadStaticCorrelationState());
 #if NET45
-                                                                      CallerContextCorrelationState.ClearCorrelation,
+            Use(new CallerContextCorrelationState());
 #else
-                                                                      AsyncLocalCorrelationState.ClearCorrelation,
+            Use(new AsyncLocalCorrelationState());
 #endif
-                                                                      ThreadStaticCorrelationState.ClearCorrelation,
-                                                                  };
+        }
 
-        private static readonly IList<Func<Guid?>> GetCurrentCorrelationId_ = new List<Func<Guid?>>
-                                                                              {
-#if NET45
-                                                                                  CallerContextCorrelationState.GetCurrentCorrelationId,
-#else
-                                                                                  AsyncLocalCorrelationState.GetCurrentCorrelationId,
-#endif
-                                                                                  ThreadStaticCorrelationState.GetCurrentCorrelationId,
-                                                                              };
-
-        private static readonly IList<Func<string, object, bool>> TryAddOrUpdateCorrelationValue_ = new List<Func<string, object, bool>>
-                                                                                                    {
-#if NET45
-                                                                                                        CallerContextCorrelationState.TryAddOrUpdateCorrelationValue,
-#else
-                                                                                                        AsyncLocalCorrelationState.TryAddOrUpdateCorrelationValue,
-#endif
-                                                                                                        ThreadStaticCorrelationState.TryAddOrUpdateCorrelationValue,
-                                                                                                    };
-
-        private static readonly IList<Func<IEnumerable<KeyValuePair<string, object>>>> GetCorrelationValues_ = new List<Func<IEnumerable<KeyValuePair<string, object>>>>
-                                                                                                               {
-#if NET45
-                                                                                                                   CallerContextCorrelationState.GetCorrelationValues,
-#else
-                                                                                                                   AsyncLocalCorrelationState.GetCorrelationValues,
-#endif
-                                                                                                                   ThreadStaticCorrelationState.GetCorrelationValues
-                                                                                                               };
+        public static void Use(ICorrelationState state)
+        {
+            CorrelationStates.Add(state);
+        }
 
         /// <summary>
         /// Initialize a new correlation state.
@@ -75,7 +43,7 @@ namespace Collector.Common.Correlation
         public static DisposableCorrelationState InitializeCorrelation(Guid? existingCorrelationId = null)
         {
             var correlationId = existingCorrelationId ?? Guid.NewGuid();
-            InitializeCorrelation_.ForEach(a => a(correlationId));
+            CorrelationStates.OrderBy(x => x.Priority).ForEach(a => a.InitializeCorrelation(correlationId));
 
             return new DisposableCorrelationState(correlationId);
         }
@@ -100,7 +68,7 @@ namespace Collector.Common.Correlation
         /// </summary>
         public static void ClearCorrelation()
         {
-            ClearCorrelation_.ForEach(a => a());
+            CorrelationStates.OrderBy(x => x.Priority).ForEach(a => a.ClearCorrelation());
         }
 
         /// <summary>
@@ -109,9 +77,9 @@ namespace Collector.Common.Correlation
         /// <returns>The current correlation id, otherwise null</returns>
         public static Guid? GetCurrentCorrelationId()
         {
-            foreach (var func in GetCurrentCorrelationId_)
+            foreach (var correlationState in CorrelationStates.OrderBy(x => x.Priority))
             {
-                var correlationId = func();
+                var correlationId = correlationState.GetCurrentCorrelationId();
                 if (correlationId.HasValue)
                     return correlationId;
             }
@@ -127,7 +95,7 @@ namespace Collector.Common.Correlation
         /// <returns>True value was added to the correlation session.</returns>
         public static bool TryAddOrUpdateCorrelationValue(string name, object value)
         {
-            return TryAddOrUpdateCorrelationValue_.Select(a => a(name, value))
+            return CorrelationStates.OrderBy(x => x.Priority).Select(a => a.TryAddOrUpdateCorrelationValue(name, value))
                                                   .ToArray()
                                                   .Any(b => b);
         }
@@ -137,11 +105,11 @@ namespace Collector.Common.Correlation
         /// </summary>
         public static IEnumerable<KeyValuePair<string, object>> GetCorrelationValues()
         {
-            foreach (var func in GetCorrelationValues_)
+            foreach (var correlationState in CorrelationStates.OrderBy(x => x.Priority))
             {
-                var correlationId = func();
-                if (correlationId != null)
-                    return correlationId;
+                var correlationValues = correlationState.GetCorrelationValues();
+                if (correlationValues != null)
+                    return correlationValues;
             }
 
             return Enumerable.Empty<KeyValuePair<string, object>>();

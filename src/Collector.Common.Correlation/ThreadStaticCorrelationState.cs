@@ -1,12 +1,11 @@
-﻿
-namespace Collector.Common.Correlation
+﻿namespace Collector.Common.Correlation
 {
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading;
     
-    internal static class ThreadStaticCorrelationState
+    internal class ThreadStaticCorrelationState : ICorrelationState
     {
         [ThreadStatic]
         private static Guid? correlationId;
@@ -16,15 +15,17 @@ namespace Collector.Common.Correlation
 
         [ThreadStatic]
         private static ConcurrentDictionary<string, object> correlationDictionary;
-        
-        public static void InitializeCorrelation(Guid newCorrelationId)
+
+        public int Priority => 200;
+
+        public void InitializeCorrelation(Guid newCorrelationId)
         {
             correlationId = newCorrelationId;
             threadId = Thread.CurrentThread.ManagedThreadId;
             correlationDictionary = new ConcurrentDictionary<string, object>();
         }
         
-        public static void ClearCorrelation()
+        public void ClearCorrelation()
         {
             threadId = null;
             correlationId = null;
@@ -32,7 +33,7 @@ namespace Collector.Common.Correlation
             correlationDictionary = null;
         }
         
-        public static Guid? GetCurrentCorrelationId()
+        public Guid? GetCurrentCorrelationId()
         {
             if (HasActiveCorrelationSession())
                 return correlationId;
@@ -40,7 +41,7 @@ namespace Collector.Common.Correlation
             return null;
         }
         
-        public static bool TryAddOrUpdateCorrelationValue(string name, object value)
+        public bool TryAddOrUpdateCorrelationValue(string name, object value)
         {
             if (!HasActiveCorrelationSession())
                 return false;
@@ -53,7 +54,7 @@ namespace Collector.Common.Correlation
             return true;
         }
         
-        public static IEnumerable<KeyValuePair<string, object>> GetCorrelationValues()
+        public IEnumerable<KeyValuePair<string, object>> GetCorrelationValues()
         {
             return correlationDictionary;
         }

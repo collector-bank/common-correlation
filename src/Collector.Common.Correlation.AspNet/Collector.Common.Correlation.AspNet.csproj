@@ -1,16 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>net45</TargetFrameworks>
     <DebugType>portable</DebugType>
-    <AssemblyName>Collector.Common.Correlation</AssemblyName>
-    <PackageId>Collector.Common.Correlation</PackageId>
+    <AssemblyName>Collector.Common.Correlation.AspNet</AssemblyName>
+    <PackageId>Collector.Common.Correlation.AspNet</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>2.0.0</Version>
+    <Version>1.0.0</Version>
     <Copyright>Copyright © 2017</Copyright>
-    <Description>Package for managing correlation ids and correlation states.</Description>
+    <Description>Package for managing correlation ids and correlation states in a asp.net application.</Description>
     <Authors>Team Heimdal, Team Nohm, Team Houdini</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/collector-bank/common-correlation</RepositoryUrl>
@@ -20,19 +19,11 @@
     <PackageIconUrl>https://raw.githubusercontent.com/collector-bank/common-correlation/master/icon.png</PackageIconUrl>
     <PackageTags>collectorbank collector</PackageTags>
   </PropertyGroup>
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Collector.Common.Correlation.xml</DocumentationFile>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
+  <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Threading.Thread">
-      <Version>4.3.0</Version>
-    </PackageReference>
+  <ItemGroup>
+    <ProjectReference Include="..\Collector.Common.Correlation\Collector.Common.Correlation.csproj" />
   </ItemGroup>
 </Project>
