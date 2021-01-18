@@ -116,6 +116,18 @@ namespace Collector.Common.Correlation
         }
 
         /// <summary>
+        /// Gets the value associated with the name in the correlation state.
+        /// <param name="name">The name of the value. If the name don´t exist it will return null.</param>
+        /// </summary>
+        public static T GetCorrelationValue<T>(string name) where T : class
+        {
+            return CorrelationStates
+                   .OrderBy(x => x.Priority)
+                   .Select(x => x.GetValue<T>(name))
+                   .FirstOrDefault(x => x != null);
+        }
+
+        /// <summary>
         /// If you jump across several different threads using different threading methods (as in WPF threading and async await nested) then you can manually resyncronize the correlation state.
         /// </summary>
         /// <returns>True if the syncronization was successful.</returns>

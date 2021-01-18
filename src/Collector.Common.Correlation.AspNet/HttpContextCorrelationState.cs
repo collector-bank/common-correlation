@@ -77,6 +77,13 @@ namespace Collector.Common.Correlation.AspNet
             return httpContext.Items[CorrelationValueDictionaryKey] as ConcurrentDictionary<string, object> ?? new ConcurrentDictionary<string, object>();
         }
 
+        public object GetValue(string name)
+            => HttpContext.Current.Items.Contains(name) ? HttpContext.Current.Items[name] : null;
+
+        public T GetValue<T>(string name)
+            where T : class
+            => GetValue(name) as T;
+
         public static void Enable()
         {
             CorrelationState.Use(new HttpContextCorrelationState());

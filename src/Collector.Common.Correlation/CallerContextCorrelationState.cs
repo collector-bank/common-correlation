@@ -54,6 +54,21 @@ namespace Collector.Common.Correlation
         {
             return CallContext.LogicalGetData(CORRELATION_ID) != null;
         }
+
+        public object GetValue(string name)
+        {
+            var values = CallContext.LogicalGetData(CORRELATION_VALUES) as ConcurrentDictionary<string, object>;
+
+            object value;
+
+            return values != null && values.TryGetValue(name, out value) ? value : null;
+        }
+
+        public T GetValue<T>(string name)
+            where T : class
+        {
+            return GetValue(name) as T;
+        }
     }
 }
 #endif
