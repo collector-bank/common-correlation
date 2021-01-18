@@ -36,6 +36,14 @@ namespace Collector.Common.Correlation
         }
 
         public IEnumerable<KeyValuePair<string, object>> GetCorrelationValues() => CorrelationValues.Value;
+
+        public object GetValue(string name) =>
+            CorrelationValues.Value != null && CorrelationValues.Value.TryGetValue(name, out var value) ? value : null;
+
+        public T GetValue<T>(string name)
+            where T : class =>
+            GetValue(name) as T;
+
     }
 }
 #endif

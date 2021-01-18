@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4651B83D-ABF7-487E-A591-D1E0C2EA8002}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Collector.Common.Correlation", "src\Collector.Common.Correlation\Collector.Common.Correlation.csproj", "{A794B639-9F10-4373-9D22-7CA7EFE9007F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{FD38999E-F777-403C-BF30-E21F847846EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Collector.Common.Correlation", "src\Collector.Common.Correlation\Collector.Common.Correlation.csproj", "{A794B639-9F10-4373-9D22-7CA7EFE9007F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Collector.Common.Correlation.UnitTest", "test\Collector.Common.Correlation.UnitTest\Collector.Common.Correlation.UnitTest.csproj", "{4FE38F50-DE1B-4B70-AC63-11BD18DA1CC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collector.Common.Correlation.AspNet", "src\Collector.Common.Correlation.AspNet\Collector.Common.Correlation.AspNet.csproj", "{D5EE331C-6342-4E29-8B86-EE43A61CB648}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Collector.Common.Correlation.AspNet", "src\Collector.Common.Correlation.AspNet\Collector.Common.Correlation.AspNet.csproj", "{D5EE331C-6342-4E29-8B86-EE43A61CB648}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collector.Common.Correlation.AspNet.Samples", "src\Collector.Common.Correlation.AspNet.Samples\Collector.Common.Correlation.AspNet.Samples.csproj", "{35630115-A6B7-4AE4-8D6C-E9B144B627A1}"
 EndProject
@@ -46,5 +46,8 @@ Global
 		{4FE38F50-DE1B-4B70-AC63-11BD18DA1CC8} = {FD38999E-F777-403C-BF30-E21F847846EE}
 		{D5EE331C-6342-4E29-8B86-EE43A61CB648} = {4651B83D-ABF7-487E-A591-D1E0C2EA8002}
 		{35630115-A6B7-4AE4-8D6C-E9B144B627A1} = {4651B83D-ABF7-487E-A591-D1E0C2EA8002}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DC2083DC-8F3B-402C-B93D-C9B37B7DD946}
 	EndGlobalSection
 EndGlobal

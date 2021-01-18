@@ -59,6 +59,13 @@
             return correlationDictionary;
         }
 
+        public object GetValue(string name) =>
+            correlationDictionary.TryGetValue(name, out var value) ? value : null;
+
+        public T GetValue<T>(string name)
+            where T : class =>
+            GetValue(name) as T;
+
         private static bool HasActiveCorrelationSession()
         {
             if (threadId == null)

@@ -22,5 +22,9 @@ namespace Collector.Common.Correlation
         bool TryAddOrUpdateCorrelationValue(string name, object value);
 
         IEnumerable<KeyValuePair<string, object>> GetCorrelationValues();
+
+        object GetValue(string name);
+
+        T GetValue<T>(string name) where T : class;
     }
 }
